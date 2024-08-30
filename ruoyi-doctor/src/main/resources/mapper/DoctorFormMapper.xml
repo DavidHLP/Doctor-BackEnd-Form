@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.web.mapper.DoctorFormMapper">
+
+    <!-- 定义FormJsonString的ResultMap -->
+    <resultMap id="FormJsonStringResultMap" type="com.ruoyi.web.entity.FormJsonString">
+        <result property="jsonStr" column="json_str"/>
+        <result property="optionsStr" column="option_str"/>
+    </resultMap>
+
+    <!-- 定义FormData的ResultMap，并嵌套FormJsonString的ResultMap -->
+    <resultMap id="FormDataResultMap" type="com.ruoyi.web.entity.FormData">
+        <id property="id" column="id"/>
+        <result property="formName" column="form_name "/>
+        <result property="createUsrid" column="create_usrid"/>
+        <result property="updateUsrid" column="update_usrid"/>
+        <result property="deleteUsrid" column="delete_usrid"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="deleteTime" column="delete_time"/>
+        <result property="status" column="status"/>
+        <result property="patientId" column="patient_id"/>
+        <association property="formJsonString" resultMap="FormJsonStringResultMap"/>
+    </resultMap>
+
+    <insert id="insertFormData" parameterType="com.ruoyi.web.entity.FormData">
+        INSERT INTO form_data_table (create_usrid, create_time, json_str, option_str, form_name)
+        VALUES (#{createUsrid}, #{createTime}, #{formJsonString.jsonStr}, #{formJsonString.optionsStr} , #{formName})
+    </insert>
+
+    <select id="selectIdByFormNameLike" parameterType="String" resultType="java.lang.Long">
+        SELECT id
+        FROM form_data_table
+        WHERE form_name LIKE CONCAT('%', #{formName}, '%')
+    </select>
+
+    <select id="selectAllIsNoHasPatientId" resultType="com.ruoyi.web.entity.FormData">
+        SELECT id,form_name as formName
+        FROM form_data_table
+        WHERE patient_id IS NULL
+    </select>
+
+    <select id="selectFormDataById" parameterType="java.lang.Long" resultMap="FormDataResultMap">
+        SELECT id, form_name, create_usrid, update_usrid, delete_usrid, create_time, update_time, delete_time, status, patient_id, json_str, option_str
+        FROM form_data_table
+        WHERE id = #{id}
+    </select>
+
+
+</mapper>
